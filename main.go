@@ -17,4 +17,5 @@ func main() {
 	app := app.NewApp(app.NewConfig())
 
 	app.Start()
+	log.Fatal(":")
 }

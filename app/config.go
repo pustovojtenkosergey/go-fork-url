@@ -9,7 +9,7 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
-		MongoUri: os.Getenv("mongodb_uri"),
-		Port:    os.Getenv("port"),
+		MongoUri: os.Getenv("MONGO_URI"),
+		Port:    os.Getenv("PORT"),
 	}
 }

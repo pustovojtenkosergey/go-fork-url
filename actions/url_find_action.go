@@ -12,11 +12,13 @@ import (
 )
 
 type UrlFindAction struct {
-	dbClient *db.DbClient
+	UrlRepository *repo.UrlRepository
 }
 
 func NewUrlFindAction(dbClient *db.DbClient) *UrlFindAction {
-	return &UrlFindAction{dbClient: dbClient}
+	return &UrlFindAction{
+		UrlRepository: dbClient.UrlRepository,
+	}
 }
 
 func (a *UrlFindAction) Handle(w http.ResponseWriter, r *http.Request, vars map[string]string) {
@@ -38,7 +40,7 @@ func (a *UrlFindAction) Handle(w http.ResponseWriter, r *http.Request, vars map[
 	filter := repo.NewFilter()
 	filter.AddValue("_id", ID)
 
-	urls, err := a.dbClient.UrlRepository.FindByFilter(context.Background(), filter)
+	urls, err := a.UrlRepository.FindByFilter(context.Background(), filter)
 
 	if err != nil || len(urls) == 0 {
 		json.NewEncoder(w).Encode(map[string]string{"error": "Url not found"})
@@ -46,5 +48,9 @@ func (a *UrlFindAction) Handle(w http.ResponseWriter, r *http.Request, vars map[
 	}
 
 	url := urls[0]
-	json.NewEncoder(w).Encode(map[string]string{"name": url.Name, "counter": fmt.Sprint(url.Counter)})
+	json.NewEncoder(w).Encode(map[string]string{
+		"id":      url.GetID().Hex(),
+		"name":    url.Name,
+		"counter": fmt.Sprint(url.Counter),
+	})
 }

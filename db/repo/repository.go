@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -14,16 +15,23 @@ type Repository struct {
 	collection *mongo.Collection
 }
 
-func (r *Repository) Insert(ctx context.Context, model models.Model) error {
+func (r *Repository) Insert(ctx context.Context, model models.Model) (primitive.ObjectID, error) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	_, err := r.collection.InsertOne(ctx, model)
+	// Perform the insert operation
+	insertOneResult, err := r.collection.InsertOne(ctx, model)
 	if err != nil {
-		return fmt.Errorf("failed to insert model: %w", err)
+		return primitive.NilObjectID, fmt.Errorf("failed to insert model: %w", err)
 	}
 
-	return nil
+	// Ensure the InsertedID is of type primitive.ObjectID
+	insertedID, ok := insertOneResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return primitive.NilObjectID, fmt.Errorf("inserted ID is not of type ObjectID")
+	}
+
+	return insertedID, nil
 }
 
 func (r *Repository) Update(ctx context.Context, model models.Model) error {

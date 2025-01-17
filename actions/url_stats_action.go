@@ -9,16 +9,18 @@ import (
 )
 
 type UrlStatsAction struct {
-	dbClient *db.DbClient
+	UrlRepository *repo.UrlRepository
 }
 
 func NewUrlStatsAction(dbClient *db.DbClient) *UrlStatsAction {
-	return &UrlStatsAction{dbClient: dbClient}
+	return &UrlStatsAction{
+		UrlRepository: dbClient.UrlRepository,
+	}
 }
 
 func (a *UrlStatsAction) Handle(w http.ResponseWriter, r *http.Request, vars map[string]string) {
 	ctx := context.Background()
-	urls, err := a.dbClient.UrlRepository.FindByFilter(ctx, repo.NewFilter())
+	urls, err := a.UrlRepository.FindByFilter(ctx, repo.NewFilter())
 
 	if err != nil {
 		http.Error(w, "Failed to fetch urls", http.StatusInternalServerError)

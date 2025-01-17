@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"log"
 	"myserv/models"
 	"time"
 
@@ -24,7 +23,6 @@ func NewUrlRepository(db *mongo.Database) *UrlRepository {
 }
 
 func (r *UrlRepository) FindByFilter(ctx context.Context, filter *Filter) ([]models.Url, error) {
-	log.Printf("FindByFilter: %v", filter)
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
