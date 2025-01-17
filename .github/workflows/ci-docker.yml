@@ -28,7 +28,11 @@ jobs:
       - name: Run containers
         run: |
           docker-compose -f docker-compose.yml up -d
-          sleep 20
+          sleep 10
+
+      - name: Wait for containers to be ready
+        run: |
+            timeout 30s bash -c "until docker exec myserv-app-container curl -sf http://localhost:8181/health; do sleep 1; done"
 
       - name: Run tests inside the container
         run: |
